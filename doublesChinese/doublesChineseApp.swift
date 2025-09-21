@@ -16,7 +16,6 @@ struct doublesChineseApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .preferredColorScheme(.light) // Force light mode
                 .environmentObject(dataManager)
                 .environmentObject(settingsManager)
         }

@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var dataManager: DataManager
     @EnvironmentObject private var settingsManager: SettingsManager
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showingWelcome = false
     
     var body: some View {
@@ -17,7 +18,7 @@ struct ContentView: View {
             // Main flashcard view
             FlashcardView(dataManager: dataManager, settingsManager: settingsManager)
                 .environment(\.colorTheme, settingsManager.selectedTheme.colorTheme)
-                .background(settingsManager.selectedTheme.colorTheme.backgroundColor)
+                .background(settingsManager.selectedTheme.colorTheme.adaptedBackgroundColor(for: colorScheme))
             
             // Welcome overlay for first-time users
             if showingWelcome {

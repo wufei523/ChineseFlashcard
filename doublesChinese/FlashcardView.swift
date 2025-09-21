@@ -11,6 +11,7 @@ struct FlashcardView: View {
     @ObservedObject var dataManager: DataManager
     @ObservedObject var settingsManager: SettingsManager
     @Environment(\.colorTheme) var colorTheme
+    @Environment(\.colorScheme) var colorScheme
     
     @State private var currentIndex = 0
     @State private var showAnswer = false

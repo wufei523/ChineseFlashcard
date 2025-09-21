@@ -8,7 +8,7 @@
 import SwiftUI
 
 // Color theme for eye health and comfort
-struct ColorTheme {
+struct ColorTheme: Equatable {
     let name: String
     let backgroundColor: Color
     let cardBackgroundColor: Color
@@ -18,6 +18,37 @@ struct ColorTheme {
     let correctButtonColor: Color
     let incorrectButtonColor: Color
     let progressBarColor: Color
+    
+    // Helper to adapt colors based on system theme
+    func adaptedBackgroundColor(for colorScheme: ColorScheme) -> Color {
+        isDarkTheme ? backgroundColor : 
+            (colorScheme == .dark ? Color(red: 0.1, green: 0.1, blue: 0.1) : backgroundColor)
+    }
+    
+    func adaptedCardBackgroundColor(for colorScheme: ColorScheme) -> Color {
+        isDarkTheme ? cardBackgroundColor :
+            (colorScheme == .dark ? Color(red: 0.15, green: 0.15, blue: 0.15) : cardBackgroundColor)
+    }
+    
+    func adaptedTextColor(for colorScheme: ColorScheme) -> Color {
+        isDarkTheme ? primaryTextColor :
+            (colorScheme == .dark ? Color(red: 0.95, green: 0.95, blue: 0.95) : primaryTextColor)
+    }
+    
+    func adaptedSecondaryTextColor(for colorScheme: ColorScheme) -> Color {
+        isDarkTheme ? secondaryTextColor :
+            (colorScheme == .dark ? Color(red: 0.7, green: 0.7, blue: 0.7) : secondaryTextColor)
+    }
+    
+    // Helper to identify if this is the dark theme
+    private var isDarkTheme: Bool {
+        name == "Dark"
+    }
+    
+    // Implement Equatable
+    static func == (lhs: ColorTheme, rhs: ColorTheme) -> Bool {
+        lhs.name == rhs.name
+    }
 }
 
 enum AppTheme: String, CaseIterable {
