@@ -23,7 +23,9 @@ struct ChineseCharacter: Identifiable, Codable {
     var lastReviewed: Date?
     
     init(character: String, pinyin: String, meaning: String, exampleWords: [String], bookNumber: Int, lessonNumber: Int) {
-        self.id = UUID()
+        // Create a deterministic UUID based on book, lesson numbers and character
+        let idString = "book\(bookNumber)lesson\(lessonNumber)char\(character)"
+        self.id = UUID(uuidString: idString.padding(toLength: 32, withPad: "0", startingAt: 0).replacingOccurrences(of: "0", with: "f")) ?? UUID()
         self.character = character
         self.pinyin = pinyin
         self.meaning = meaning
@@ -57,7 +59,9 @@ struct Lesson: Identifiable, Codable {
     var characters: [ChineseCharacter]
     
     init(bookNumber: Int, lessonNumber: Int, title: String, characters: [ChineseCharacter]) {
-        self.id = UUID()
+        // Create a deterministic UUID based on book and lesson numbers
+        let idString = "book\(bookNumber)lesson\(lessonNumber)"
+        self.id = UUID(uuidString: idString.padding(toLength: 32, withPad: "0", startingAt: 0).replacingOccurrences(of: "0", with: "f")) ?? UUID()
         self.bookNumber = bookNumber
         self.lessonNumber = lessonNumber
         self.title = title
