@@ -17,6 +17,7 @@ struct FlashcardView: View {
     @State private var practiceCharacters: [ChineseCharacter] = []
     @State private var sessionStats = SessionStats()
     @State private var showingSettings = false
+    @State private var showingRestartConfirmation = false
     
     var currentCharacter: ChineseCharacter? {
         guard currentIndex < practiceCharacters.count else { return nil }
@@ -25,7 +26,7 @@ struct FlashcardView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header with settings and skip buttons
+            // Header with settings and action buttons
             HStack {
                 Button {
                     showingSettings = true
@@ -42,10 +43,23 @@ struct FlashcardView: View {
                 
                 Spacer()
                 
-                Button("Skip") {
-                    nextCard()
+                HStack(spacing: 12) {
+                    // Restart Session button
+                    Button {
+                        showingRestartConfirmation = true
+                    } label: {
+                        Image(systemName: "arrow.clockwise.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(colorTheme.accentColor)
+                    }
+                    .disabled(currentCharacter == nil)
+                    
+                    // Skip button
+                    Button("Skip") {
+                        nextCard()
+                    }
+                    .disabled(currentCharacter == nil)
                 }
-                .disabled(currentCharacter == nil)
             }
             .padding()
             
@@ -147,6 +161,14 @@ struct FlashcardView: View {
                 .presentationDetents([.large])
                 .presentationDragIndicator(.hidden)
         }
+        .alert("Restart Session", isPresented: $showingRestartConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Restart", role: .destructive) {
+                restartSession()
+            }
+        } message: {
+            Text("Are you sure you want to restart this session? Your current progress will be lost.")
+        }
         .onAppear {
             setupPracticeSession()
         }
@@ -169,6 +191,18 @@ struct FlashcardView: View {
         currentIndex = 0
         showAnswer = false
         sessionStats = SessionStats()
+    }
+    
+    private func restartSession() {
+        // Reset all session state
+        setupPracticeSession()
+        
+        // Reset any UI state
+        showAnswer = false
+        
+        // Optional: Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+        impactFeedback.impactOccurred()
     }
     
     private func markAnswer(correct: Bool) {
