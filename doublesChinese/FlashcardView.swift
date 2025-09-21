@@ -219,13 +219,13 @@ struct FlashcardContentView: View {
                     VStack(spacing: 16) {
                         // Pinyin
                         Text(character.pinyin)
-                            .font(.title)
+                            .font(.largeTitle)
                             .fontWeight(.semibold)
                             .foregroundColor(colorTheme.accentColor)
                         
                         // Meaning
                         Text(character.meaning)
-                            .font(.title2)
+                            .font(.largeTitle)
                             .fontWeight(.medium)
                             .foregroundColor(colorTheme.secondaryTextColor)
                         
@@ -238,7 +238,7 @@ struct FlashcardContentView: View {
                             
                             ForEach(character.exampleWords, id: \.self) { example in
                                 Text(example)
-                                    .font(.body)
+                                    .font(.title3)
                                     .foregroundColor(colorTheme.secondaryTextColor)
                                     .multilineTextAlignment(.leading)
                             }

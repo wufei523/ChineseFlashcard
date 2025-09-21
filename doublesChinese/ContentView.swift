@@ -29,6 +29,14 @@ struct ContentView: View {
         .onAppear {
             setupApp()
         }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            // Save settings when app goes to background
+            settingsManager.saveSettings()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification)) { _ in
+            // Save settings when app terminates
+            settingsManager.saveSettings()
+        }
     }
     
     private func setupApp() {

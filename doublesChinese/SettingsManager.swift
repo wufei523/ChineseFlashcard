@@ -8,12 +8,44 @@
 import Foundation
 
 class SettingsManager: ObservableObject {
-    @Published var selectedLessonIds: Set<UUID> = []
-    @Published var shuffleCards: Bool = true
-    @Published var reviewMode: Bool = false
+    private var isLoading = false // Flag to prevent saving during initialization
+    
+    @Published var selectedLessonIds: Set<UUID> = [] {
+        didSet {
+            if !isLoading {
+                saveSelectedLessons()
+            }
+        }
+    }
+    @Published var shuffleCards: Bool = true {
+        didSet {
+            if !isLoading {
+                saveSetting(shuffleCards, forKey: shuffleCardsKey)
+            }
+        }
+    }
+    @Published var reviewMode: Bool = false {
+        didSet {
+            if !isLoading {
+                saveSetting(reviewMode, forKey: reviewModeKey)
+            }
+        }
+    }
     @Published var isFirstLaunch: Bool = true
-    @Published var selectedTheme: AppTheme = .forest
-    @Published var sessionSize: Int = 10 // Default to 10 cards per session
+    @Published var selectedTheme: AppTheme = .forest {
+        didSet {
+            if !isLoading {
+                saveSetting(selectedTheme.rawValue, forKey: selectedThemeKey)
+            }
+        }
+    }
+    @Published var sessionSize: Int = 10 {
+        didSet {
+            if !isLoading {
+                saveSetting(sessionSize, forKey: sessionSizeKey)
+            }
+        }
+    }
     
     private let selectedLessonsKey = "selectedLessons"
     private let shuffleCardsKey = "shuffleCards"
@@ -26,12 +58,26 @@ class SettingsManager: ObservableObject {
         loadSettings()
     }
     
+    private func saveSetting<T>(_ value: T, forKey key: String) {
+        UserDefaults.standard.set(value, forKey: key)
+    }
+    
+    private func saveSelectedLessons() {
+        if let encodedIds = try? JSONEncoder().encode(selectedLessonIds) {
+            UserDefaults.standard.set(encodedIds, forKey: selectedLessonsKey)
+        }
+    }
+    
     func loadSettings() {
+        // Disable automatic saving during load
+        isLoading = true
+        
         // Load shuffle and review mode settings
         shuffleCards = UserDefaults.standard.object(forKey: shuffleCardsKey) as? Bool ?? true
         reviewMode = UserDefaults.standard.object(forKey: reviewModeKey) as? Bool ?? false
-        isFirstLaunch = UserDefaults.standard.object(forKey: firstLaunchKey) as? Bool ?? true
         sessionSize = UserDefaults.standard.object(forKey: sessionSizeKey) as? Int ?? 10
+        
+        isFirstLaunch = UserDefaults.standard.object(forKey: firstLaunchKey) as? Bool ?? true
         
         // Load selected theme
         if let themeRawValue = UserDefaults.standard.string(forKey: selectedThemeKey),
@@ -47,6 +93,9 @@ class SettingsManager: ObservableObject {
                 selectedLessonIds = decodedIds
             }
         }
+        
+        // Re-enable automatic saving
+        isLoading = false
     }
     
     func saveSettings() {
