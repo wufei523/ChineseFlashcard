@@ -65,92 +65,95 @@ struct FlashcardView: View {
             
             GeometryReader { geometry in
                 VStack(spacing: 20) {
-                    // Progress bar
-                    ProgressView(value: Double(currentIndex), total: Double(practiceCharacters.count))
-                        .progressViewStyle(LinearProgressViewStyle(tint: colorTheme.progressBarColor))
-                        .scaleEffect(x: 1, y: 2, anchor: .center)
-                        .padding(.horizontal)
-                    
-                    // Progress info
-                    HStack {
-                        Text("\(currentIndex + 1) of \(practiceCharacters.count)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                    // Top section with progress and stats
+                    VStack(spacing: 10) {
+                        // Progress bar
+                        ProgressView(value: Double(currentIndex), total: Double(practiceCharacters.count))
+                            .progressViewStyle(LinearProgressViewStyle(tint: colorTheme.progressBarColor))
+                            .scaleEffect(x: 1, y: 2, anchor: .center)
+                            .padding(.horizontal)
                         
-                        Spacer()
-                        
-                        HStack(spacing: 16) {
-                            Label("\(sessionStats.correct)", systemImage: "checkmark.circle.fill")
-                                .foregroundColor(.green)
+                        // Progress info
+                        HStack {
+                            Text("\(currentIndex + 1) of \(practiceCharacters.count)")
                                 .font(.caption)
+                                .foregroundColor(.secondary)
                             
-                            Label("\(sessionStats.incorrect)", systemImage: "xmark.circle.fill")
-                                .foregroundColor(.red)
-                                .font(.caption)
-                        }
-                    }
-                    .padding(.horizontal)
-                    
-                    Spacer()
-                    
-                    // Main flashcard
-                    if let character = currentCharacter {
-                        FlashcardContentView(
-                            character: character,
-                            showAnswer: showAnswer,
-                            geometry: geometry
-                        ) {
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                showAnswer.toggle()
-                            }
-                        }
-                    } else {
-                        // Session complete
-                        SessionCompleteView(
-                            stats: sessionStats,
-                            totalCharacters: practiceCharacters.count
-                        ) {
-                            // Restart with current settings
-                            setupPracticeSession()
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    // Answer buttons (only show when answer is revealed)
-                    if showAnswer && currentCharacter != nil {
-                        HStack(spacing: 20) {
-                            Button(action: { markAnswer(correct: false) }) {
-                                HStack {
-                                    Image(systemName: "xmark.circle.fill")
-                                    Text("Don't Know")
-                                }
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(colorTheme.incorrectButtonColor)
-                                .cornerRadius(12)
-                            }
+                            Spacer()
                             
-                            Button(action: { markAnswer(correct: true) }) {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                    Text("I Know")
-                                }
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(colorTheme.correctButtonColor)
-                                .cornerRadius(12)
+                            HStack(spacing: 16) {
+                                Label("\(sessionStats.correct)", systemImage: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                    .font(.caption)
+                                
+                                Label("\(sessionStats.incorrect)", systemImage: "xmark.circle.fill")
+                                    .foregroundColor(.red)
+                                    .font(.caption)
                             }
                         }
                         .padding(.horizontal)
                     }
                     
-                    // Navigation hint
-                    if !showAnswer {
-                        Text("Tap the card to see the answer")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom)
+                    // Center section with flashcard
+                    ZStack {
+                        if let character = currentCharacter {
+                            FlashcardContentView(
+                                character: character,
+                                showAnswer: showAnswer,
+                                geometry: geometry
+                            ) {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    showAnswer.toggle()
+                                }
+                            }
+                        } else {
+                            // Session complete
+                            SessionCompleteView(
+                                stats: sessionStats,
+                                totalCharacters: practiceCharacters.count
+                            ) {
+                                // Restart with current settings
+                                setupPracticeSession()
+                            }
+                        }
+                    }
+                    .frame(maxHeight: .infinity)
+                    
+                    // Bottom section with buttons
+                    VStack(spacing: 10) {
+                        if showAnswer && currentCharacter != nil {
+                            HStack(spacing: 20) {
+                                Button(action: { markAnswer(correct: false) }) {
+                                    HStack {
+                                        Image(systemName: "xmark.circle.fill")
+                                        Text("Don't Know")
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(colorTheme.incorrectButtonColor)
+                                    .cornerRadius(12)
+                                }
+                                
+                                Button(action: { markAnswer(correct: true) }) {
+                                    HStack {
+                                        Image(systemName: "checkmark.circle.fill")
+                                        Text("I Know")
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(colorTheme.correctButtonColor)
+                                    .cornerRadius(12)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                        
+                        if !showAnswer {
+                            Text("Tap the card to see the answer")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .padding(.bottom, 5)
+                        }
                     }
                 }
             }
@@ -259,7 +262,7 @@ struct FlashcardContentView: View {
                         
                         // Meaning
                         Text(character.meaning)
-                            .font(.largeTitle)
+                            .font(.title2)
                             .fontWeight(.medium)
                             .foregroundColor(colorTheme.secondaryTextColor)
                         

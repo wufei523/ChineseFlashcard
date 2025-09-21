@@ -43,6 +43,8 @@ struct ContentView: View {
         if settingsManager.isFirstLaunch {
             // Set default selections for first-time users
             settingsManager.setDefaultSelections(dataManager: dataManager)
+            // Immediately mark first launch complete to avoid overwriting user choices on next launch
+            settingsManager.saveSettings()
             showingWelcome = true
         }
     }
