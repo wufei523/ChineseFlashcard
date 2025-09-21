@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var dataManager = DataManager()
-    @StateObject private var settingsManager = SettingsManager()
+    @EnvironmentObject private var dataManager: DataManager
+    @EnvironmentObject private var settingsManager: SettingsManager
     @State private var showingWelcome = false
     
     var body: some View {

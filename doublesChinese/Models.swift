@@ -23,9 +23,11 @@ struct ChineseCharacter: Identifiable, Codable {
     var lastReviewed: Date?
     
     init(character: String, pinyin: String, meaning: String, exampleWords: [String], bookNumber: Int, lessonNumber: Int) {
-        // Create a deterministic UUID based on book, lesson numbers and character
-        let idString = "book\(bookNumber)lesson\(lessonNumber)char\(character)"
-        self.id = UUID(uuidString: idString.padding(toLength: 32, withPad: "0", startingAt: 0).replacingOccurrences(of: "0", with: "f")) ?? UUID()
+        // Create a deterministic UUID based on book, lesson numbers and character unicode value
+        let charValue = character.unicodeScalars.first?.value ?? 0
+        let value = (UInt(bookNumber) * 1000000 + UInt(lessonNumber) * 1000 + UInt(charValue % 1000))
+        let uuidString = String(format: "00000000-0000-4000-8000-%012d", value)
+        self.id = UUID(uuidString: uuidString)!
         self.character = character
         self.pinyin = pinyin
         self.meaning = meaning
@@ -60,8 +62,8 @@ struct Lesson: Identifiable, Codable {
     
     init(bookNumber: Int, lessonNumber: Int, title: String, characters: [ChineseCharacter]) {
         // Create a deterministic UUID based on book and lesson numbers
-        let idString = "book\(bookNumber)lesson\(lessonNumber)"
-        self.id = UUID(uuidString: idString.padding(toLength: 32, withPad: "0", startingAt: 0).replacingOccurrences(of: "0", with: "f")) ?? UUID()
+        let uuidString = String(format: "00000000-0000-4000-8000-%012d", bookNumber * 1000 + lessonNumber)
+        self.id = UUID(uuidString: uuidString)!
         self.bookNumber = bookNumber
         self.lessonNumber = lessonNumber
         self.title = title

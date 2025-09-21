@@ -13,6 +13,11 @@ class DataManager: ObservableObject {
     
     init() {
         loadSampleData()
+        // Print lesson IDs for debugging
+        print("DataManager initialized with lessons:")
+        lessons.forEach { lesson in
+            print("Lesson \(lesson.bookNumber)-\(lesson.lessonNumber) ID: \(lesson.id)")
+        }
     }
     
     private func loadSampleData() {

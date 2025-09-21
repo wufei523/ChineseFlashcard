@@ -63,8 +63,20 @@ class SettingsManager: ObservableObject {
     }
     
     private func saveSelectedLessons() {
-        if let encodedIds = try? JSONEncoder().encode(selectedLessonIds) {
-            UserDefaults.standard.set(encodedIds, forKey: selectedLessonsKey)
+        print("Attempting to save selected lessons: \(selectedLessonIds.count) lessons")
+        
+        // Save as array of strings for better reliability
+        let idStrings = selectedLessonIds.map { $0.uuidString }
+        print("Converting to strings: \(idStrings)")
+        
+        UserDefaults.standard.set(idStrings, forKey: selectedLessonsKey)
+        UserDefaults.standard.synchronize()
+        
+        // Verify the save
+        if let savedStrings = UserDefaults.standard.array(forKey: selectedLessonsKey) as? [String] {
+            print("Verified save - found \(savedStrings.count) lessons in UserDefaults")
+        } else {
+            print("Warning: Failed to verify saved lessons")
         }
     }
     
@@ -87,11 +99,23 @@ class SettingsManager: ObservableObject {
             selectedTheme = .forest // Default to forest theme
         }
         
-        // Load selected lesson IDs
-        if let savedLessonIds = UserDefaults.standard.data(forKey: selectedLessonsKey) {
-            if let decodedIds = try? JSONDecoder().decode(Set<UUID>.self, from: savedLessonIds) {
-                selectedLessonIds = decodedIds
+        // Load selected lesson IDs using string array approach
+        print("Loading settings...")
+        if let savedIdStrings = UserDefaults.standard.array(forKey: selectedLessonsKey) as? [String] {
+            print("Found \(savedIdStrings.count) saved lesson IDs")
+            
+            let loadedIds = savedIdStrings.compactMap { UUID(uuidString: $0) }
+            print("Converted \(loadedIds.count) valid UUIDs")
+            
+            selectedLessonIds = Set(loadedIds)
+            print("Set \(selectedLessonIds.count) lesson IDs")
+            
+            // Print each loaded ID for debugging
+            selectedLessonIds.forEach { id in
+                print("Loaded lesson ID: \(id)")
             }
+        } else {
+            print("No saved lesson IDs found in UserDefaults")
         }
         
         // Re-enable automatic saving
@@ -99,16 +123,19 @@ class SettingsManager: ObservableObject {
     }
     
     func saveSettings() {
+        print("Saving all settings...")
         UserDefaults.standard.set(shuffleCards, forKey: shuffleCardsKey)
         UserDefaults.standard.set(reviewMode, forKey: reviewModeKey)
         UserDefaults.standard.set(false, forKey: firstLaunchKey) // No longer first launch
         UserDefaults.standard.set(selectedTheme.rawValue, forKey: selectedThemeKey)
         UserDefaults.standard.set(sessionSize, forKey: sessionSizeKey)
         
-        // Save selected lesson IDs
-        if let encodedIds = try? JSONEncoder().encode(selectedLessonIds) {
-            UserDefaults.standard.set(encodedIds, forKey: selectedLessonsKey)
-        }
+        // Save selected lesson IDs using string array approach
+        let idStrings = selectedLessonIds.map { $0.uuidString }
+        UserDefaults.standard.set(idStrings, forKey: selectedLessonsKey)
+        
+        UserDefaults.standard.synchronize()
+        print("Settings saved. Selected lessons count: \(selectedLessonIds.count)")
     }
     
     func setDefaultSelections(dataManager: DataManager) {
