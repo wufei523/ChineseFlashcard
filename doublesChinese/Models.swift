@@ -14,7 +14,7 @@ struct ChineseCharacter: Identifiable, Codable {
     let pinyin: String
     let meaning: String
     let exampleWords: [String]
-    let bookNumber: Int
+    let bookNumber: Double // Changed to Double to support decimal book numbers (e.g., 2.1)
     let lessonNumber: Int
     
     // For tracking learning progress
@@ -22,10 +22,11 @@ struct ChineseCharacter: Identifiable, Codable {
     var correctCount: Int = 0
     var lastReviewed: Date?
     
-    init(character: String, pinyin: String, meaning: String, exampleWords: [String], bookNumber: Int, lessonNumber: Int) {
+    init(character: String, pinyin: String, meaning: String, exampleWords: [String], bookNumber: Double, lessonNumber: Int) {
         // Create a deterministic UUID based on book, lesson numbers and character unicode value
         let charValue = character.unicodeScalars.first?.value ?? 0
-        let value = (UInt(bookNumber) * 1000000 + UInt(lessonNumber) * 1000 + UInt(charValue % 1000))
+        let bookValue = UInt(bookNumber * 10) // Convert 2.1 to 21 for unique ID generation
+        let value = (bookValue * 1000000 + UInt(lessonNumber) * 1000 + UInt(charValue % 1000))
         let uuidString = String(format: "00000000-0000-4000-8000-%012d", value)
         self.id = UUID(uuidString: uuidString)!
         self.character = character
@@ -55,14 +56,15 @@ enum DifficultyLevel: String, CaseIterable {
 // Model for organizing lessons
 struct Lesson: Identifiable, Codable {
     let id: UUID
-    let bookNumber: Int
+    let bookNumber: Double // Changed to Double to support decimal book numbers (e.g., 2.1)
     let lessonNumber: Int
     let title: String
     var characters: [ChineseCharacter]
     
-    init(bookNumber: Int, lessonNumber: Int, title: String, characters: [ChineseCharacter]) {
+    init(bookNumber: Double, lessonNumber: Int, title: String, characters: [ChineseCharacter]) {
         // Create a deterministic UUID based on book and lesson numbers
-        let uuidString = String(format: "00000000-0000-4000-8000-%012d", bookNumber * 1000 + lessonNumber)
+        let bookValue = Int(bookNumber * 10) // Convert 2.1 to 21 for unique ID generation
+        let uuidString = String(format: "00000000-0000-4000-8000-%012d", bookValue * 1000 + lessonNumber)
         self.id = UUID(uuidString: uuidString)!
         self.bookNumber = bookNumber
         self.lessonNumber = lessonNumber
@@ -71,7 +73,7 @@ struct Lesson: Identifiable, Codable {
     }
     
     var lessonIdentifier: String {
-        "Book \(bookNumber), Lesson \(lessonNumber)"
+        "Book \(String(format: "%.1f", bookNumber)), Lesson \(lessonNumber)"
     }
 }
 
