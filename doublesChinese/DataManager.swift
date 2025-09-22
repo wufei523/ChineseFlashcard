@@ -403,12 +403,12 @@ class DataManager: ObservableObject {
     }
     
     // Get lessons for a specific book
-    func getLessons(for bookNumber: Int) -> [Lesson] {
+    func getLessons(for bookNumber: Double) -> [Lesson] {
         return lessons.filter { $0.bookNumber == bookNumber }
     }
     
     // Get all unique book numbers
-    func getAvailableBooks() -> [Int] {
+    func getAvailableBooks() -> [Double] {
         return Array(Set(lessons.map { $0.bookNumber })).sorted()
     }
     

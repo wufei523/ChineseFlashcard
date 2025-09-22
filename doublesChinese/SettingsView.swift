@@ -241,7 +241,7 @@ struct SettingsView: View {
 }
 
 struct BookSelectionSection: View {
-    let bookNumber: Int
+    let bookNumber: Double
     let lessons: [Lesson]
     @Binding var selectedLessons: Set<UUID>
     
@@ -250,14 +250,14 @@ struct BookSelectionSection: View {
     }
     
     var body: some View {
-        DisclosureGroup("Book \(bookNumber)") {
+        DisclosureGroup("Book \(String(format: "%.1f", bookNumber))") {
             // Select all for this book
             HStack {
                 Button(action: toggleAllLessons) {
                     HStack {
                         Image(systemName: allLessonsSelected ? "checkmark.square.fill" : "square")
                             .foregroundColor(allLessonsSelected ? .blue : .secondary)
-                        Text("Select All Book \(bookNumber)")
+                        Text("Select All Book \(String(format: "%.1f", bookNumber))")
                     }
                 }
                 .buttonStyle(.plain)
